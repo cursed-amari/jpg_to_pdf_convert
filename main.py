@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import QFileDialog
 from main_window_class import Ui_MainWindow
 
 
-logger.add("debug.log", format="{time}, {level}, {message}", level="DEBUG", rotation="2 days", retention="2 days")
+# logger.add("debug.log", format="{time}, {level}, {message}", level="DEBUG", rotation="2 days", retention="2 days")
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -67,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @logger.catch
     def convert_img(self, bool_val=False):
-        if self.check_out_folder:
+        if self.check_out_folder():
             step = 0
             process = 100/len(self.filter_list_file)
 
@@ -76,7 +76,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 image_1 = Image.open(path_to_file)
                 im_1 = image_1.convert('RGB')
                 file_name = re.sub(r'\.\w{1,5}$', "", entry)
-                im_1.save(f'{os.getcwd()}/pdf/{file_name}.pdf')
+                im_1.save(f'{os.getcwd()}\\pdf\\{file_name}.pdf')
                 step += process
                 self.progressBar.setValue(int(step))
 
@@ -97,7 +97,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def check_out_folder(self):
         if not os.path.exists(os.getcwd() + "\pdf"):
             os.mkdir(os.getcwd() + "\pdf")
-        return True
+            return True
+        else:
+            return False
 
 
 if __name__ == "__main__":
