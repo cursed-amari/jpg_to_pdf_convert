@@ -4,6 +4,7 @@ import re
 
 from PIL import Image
 from loguru import logger
+from datetime import datetime
 
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QFileDialog
@@ -66,7 +67,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.listWidget_folder_files.addItem(i)
 
     @logger.catch
+    def current_date(self):
+        return f"{datetime.now().day}.{datetime.now().month}.{datetime.now().year}"
+
+    @logger.catch
     def convert_img(self, bool_val=False):
+        self.progressBar.setValue(0)
+        self.hide_progressbar(False)
+        save_name_counter = 0
         if self.check_out_folder():
             step = 0
             process = 100/len(self.filter_list_file)
@@ -76,7 +84,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 image_1 = Image.open(path_to_file)
                 im_1 = image_1.convert('RGB')
                 file_name = re.sub(r'\.\w{1,5}$', "", entry)
-                im_1.save(f'{os.getcwd()}\\pdf\\{file_name}.pdf')
+                if os.path.exists(f'{os.getcwd()}\\pdf\\{file_name}_{self.current_date()}.pdf'):
+                    while True:
+                        if os.path.exists(f'{os.getcwd()}\\pdf\\{file_name}_{self.current_date()} ({save_name_counter}).pdf'):
+                            save_name_counter += 1
+                            continue
+                        else:
+                            correct_path = f'{os.getcwd()}\\pdf\\{file_name}_{self.current_date()} ({save_name_counter}).pdf'
+                            break
+                else:
+                    correct_path = f'{os.getcwd()}\\pdf\\{file_name}_{self.current_date()}.pdf'
+                im_1.save(correct_path)
                 step += process
                 self.progressBar.setValue(int(step))
 
@@ -99,7 +117,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             os.mkdir(os.getcwd() + "\pdf")
             return True
         else:
-            return False
+            return True
 
 
 if __name__ == "__main__":
